@@ -1,24 +1,18 @@
-import http
-import typing
+class Errorhandler(Exception):
+    def __init__(self, status_code: int, message: str) -> None:
+        super().__init__(f"{status_code}:{message}")
+        self.error_code = status_code
+
+class AuthenticationError(Errorhandler):
+    def __init__(self, message: str) -> None:
+        super().__init__(401, message)
 
 
-class AuthenticationError(Exception):
-    pass
+class HTTPException(Errorhandler):
+    def __init__(self, status_code: int, message: str) -> None:
+        super().__init__(status_code, message)
 
 
-class HTTPException(Exception):
-    def __init__(
-            self,
-            status_code: int,
-            detail: typing.Optional[str] = None,
-            headers: typing.Optional[dict] = None,
-    ) -> None:
-        if detail is None:
-            detail = http.HTTPStatus(status_code).phrase
-        self.status_code = status_code
-        self.detail = detail
-        self.headers = headers
-
-    def __repr__(self) -> str:
-        class_name = self.__class__.__name__
-        return f"{class_name}(status_code={self.status_code!r}, detail={self.detail!r})"
+class S3Error(Errorhandler):
+    def __init__(self, status_code: int, message: str) -> None:
+        super().__init__(status_code, message)
